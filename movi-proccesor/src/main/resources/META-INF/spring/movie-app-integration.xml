@@ -19,6 +19,16 @@
     <int:channel id="input"/>
 
     <!-- Spring Integration: Service Activator -->
-    <int:service-activator id="movieProcessor" input-channel="input" ref="movieEndpoint" />
+    <int:service-activator id="movieProcessor" input-channel="input" ref="movieEndpoint"
+                           output-channel="output"/>
+
+    <!-- Spring Integration: Direct Channel -->
+    <int:channel id="output"/>
+
+    <!--  Spring Integration: File -->
+    <int-file:outbound-channel-adapter channel="output"
+                                       directory="target/output"
+                                       filename-generator-expression="headers['name'] + '.processed'" />
+
 
 </beans>

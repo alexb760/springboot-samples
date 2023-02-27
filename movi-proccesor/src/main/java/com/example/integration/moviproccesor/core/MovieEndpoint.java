@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Headers;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.StreamUtils;
 
 import java.io.File;
@@ -23,11 +25,13 @@ public class MovieEndpoint {
     }
     private static final Logger log = LoggerFactory.getLogger(MovieEndpoint.class);
     @ServiceActivator
-    public void process(File input, @Headers Map<String, Objects> headers) throws IOException {
+    public Message<String> process(File input, @Headers Map<String, Objects> headers) throws IOException {
         FileInputStream inputStream = new FileInputStream(input);
 //        String movie = new String(StreamUtils.copyToByteArray(inputStream));
         String movie = movieService.formatMovieFromChannel(new String(StreamUtils.copyToByteArray(inputStream)));
         inputStream.close();
         log.info(movie);
+        return MessageBuilder.withPayload(movie).setHeader("name", input.getName())
+                .setHeader("Content-Type","application/json").build();
     }
 }
