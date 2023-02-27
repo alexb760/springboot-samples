@@ -5,10 +5,10 @@
        xmlns:int-file="http://www.springframework.org/schema/integration/file"
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:int-http="http://www.springframework.org/schema/integration/http"
-       xsi:schemaLocation="http://www.springframework.org/schema/integration/feed https://www.springframework.org/schema/integration/feed/spring-integration-feed.xsd
-		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/integration/file https://www.springframework.org/schema/integration/file/spring-integration-file.xsd
-		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+        http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <!-- Spring Integration -->
     <int-file:inbound-channel-adapter channel="input" directory="target/input" filename-pattern="*.txt">
@@ -19,16 +19,28 @@
     <int:channel id="input"/>
 
     <!-- Spring Integration: Service Activator -->
-    <int:service-activator id="movieProcessor" input-channel="input" ref="movieEndpoint"
-                           output-channel="output"/>
+    <int:service-activator input-channel="input" ref="movieEndpoint" output-channel="output"/>
 
     <!-- Spring Integration: Direct Channel -->
     <int:channel id="output"/>
 
-    <!--  Spring Integration: File -->
-    <int-file:outbound-channel-adapter channel="output"
+    <!-- Spring Integration: Router -->
+    <int:recipient-list-router input-channel="output">
+        <int:recipient channel="toFile" />
+        <int:recipient channel="toHttp"/>
+    </int:recipient-list-router>
+
+    <!-- Spring Integration: Direct Channels -->
+    <int:channel id="toFile"/>
+    <int:channel id="toHttp"/>
+
+    <!-- Spring Integration: File and Http -->
+    <int-file:outbound-channel-adapter channel="toFile"
                                        directory="target/output"
                                        filename-generator-expression="headers['name'] + '.processed'" />
-
-
+    <int-http:outbound-channel-adapter
+            id="httpChannelAdapter"
+            channel="toHttp"
+            url="http://localhost:8080/v1/movies"
+            http-method="POST"/>
 </beans>
