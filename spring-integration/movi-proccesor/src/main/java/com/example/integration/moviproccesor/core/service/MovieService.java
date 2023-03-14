@@ -21,7 +21,7 @@ public class MovieService {
 
     public String formatMovieFromChannel(String contents){
         LOGGER.info("Formating to Json...");
-        String json = "{}";
+        String json;
         ObjectMapper mapper = new ObjectMapper();
         try {
             json = mapper.writeValueAsString(parseContent(contents));

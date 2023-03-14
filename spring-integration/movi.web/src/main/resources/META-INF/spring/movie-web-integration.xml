@@ -15,12 +15,12 @@
     <!-- Spring Integration: Http -->
     <int-http:inbound-channel-adapter id="movie"
                                       supported-methods="POST" channel="input" path="/v2/movie"
-                                      request-payload-type="com.apress.integration.movieweb.Movie"
+                                      request-payload-type="com.example.integration.movi.web.controller.Movie"
                                       status-code-expression="T(org.springframework.http.HttpStatus).ACCEPTED"/>
 
     <int-http:inbound-channel-adapter id="movies"
                                       supported-methods="POST" channel="input" path="/v2/movies"
-                                      request-payload-type="com.apress.integration.movieweb.Movie[]"
+                                      request-payload-type="com.example.integration.movi.web.controller.Movie[]"
                                       status-code-expression="T(org.springframework.http.HttpStatus).ACCEPTED"/>
 
     <!-- Spring Integration: Execution Channel -->
