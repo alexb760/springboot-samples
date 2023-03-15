@@ -14,7 +14,7 @@ This remote system has a REST API service that takes your collection (/v1/movies
 After receiving the information, it saves it to a database (MySQL) and sends an email to the admin user.
 
 ## Design:
- ![](/springboot-samples/spring-integration/asset/general-design.png)
+ ![basic sketch](asset/general-design.jpeg)
 
 ## Example File:
 The sample file can be found in ``asset`` directory. copy to ``target/input`` 
