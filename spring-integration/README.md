@@ -1,5 +1,5 @@
 # Spring Boot Integration.
-This example is taken from [Spring Cloud Data Flow.](https://www.amazon.com/Spring-Cloud-Data-Flow-Orchestration/dp/1484212401)
+This example is taken from book [Spring Cloud Data Flow.](https://www.amazon.com/Spring-Cloud-Data-Flow-Orchestration/dp/1484212401)
 I added a few things more instead.
 
 ## Environment
