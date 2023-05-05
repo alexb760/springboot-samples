@@ -1,8 +1,11 @@
-package com.drones.dispatcherdrone.medicationmanager.ports.entity;
+package com.drones.dispatcherdrone.medicationmanager.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,58 +14,78 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 @Entity
 @Table(name = "prescription_load")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Getter
 public class PrescriptionLoad {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonProperty()
   private Long loadId;
 
   @Column(length = 45, nullable = false)
-  @Min(5)
-  @Max(45)
   private String orderCode;
 
   @Column(length = 3, nullable = false)
   @Min(1)
   @Max(500)
-  private Integer totalWeight;
+  private Double totalWeight;
 
   @Column(nullable = false, name = "created_at")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
 
-  @Builder.Default
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "prescriptionLoad")
-  private Collection<PrescriptionMedicationItem> items = new ArrayList<>();
+  @Column(length = 15)
+  private String status;
 
-  // Keeping boots side of relation in Sync by some handlers methods.
-  public void addmedicationItem(PrescriptionMedicationItem item) {
-    this.items.add(item);
-    item.setPrescriptionLoad(this);
+  @OneToMany(
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "prescriptionLoad",
+      fetch = FetchType.LAZY)
+  private Set<Medication> items;
+
+  public static PrescriptionLoad withCodeOrder(String codeOrder) {
+    return new PrescriptionLoad(null, codeOrder, 0D, LocalDateTime.now(), "READY", new HashSet<>());
   }
 
-  public void removeMedicationItem(PrescriptionMedicationItem item) {
+  // Keeping boots side of relation in Sync by some handlers methods.
+  public PrescriptionLoad addMedicationItem(Medication item) {
+    this.items.add(item);
+    this.totalWeight = this.totalWeight + item.getWeight();
+    item.setPrescriptionLoad(this);
+    return this;
+  }
+
+  public void removeMedicationItem(Medication item) {
     item.setPrescriptionLoad(null);
     this.items.remove(item);
+    this.totalWeight = this.totalWeight - item.getWeight();
   }
 
   public void removeAllItem() {
-    Iterator<PrescriptionMedicationItem> iterator = this.items.iterator();
+    Iterator<Medication> iterator = this.items.iterator();
     while (iterator.hasNext()) {
-      PrescriptionMedicationItem item = iterator.next();
+      var item = iterator.next();
       item.setPrescriptionLoad(null);
       iterator.remove();
+    }
+    this.totalWeight = 0D;
+  }
+
+  public void checkLoadWeightCapacity() {
+    if (this.totalWeight > 500) {
+      throw new IllegalArgumentException("Load capacity should be less or equal to 500 gr");
     }
   }
   // end of handlers.
@@ -76,7 +99,7 @@ public class PrescriptionLoad {
   @Override
   public String toString() {
     return String.format(
-        "PrescriptionLoad:{loadId: %d, orderCode: %s, totalWeight: %d, createdAt: %s}",
+        "PrescriptionLoad:{loadId: %d, orderCode: %s, totalWeight: %s, createdAt: %s}",
         loadId, orderCode, totalWeight, createdAt.toString());
   }
 }

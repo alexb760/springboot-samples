@@ -55,3 +55,5 @@ The join column defined by the owner entity (Book) stores the ID value and has a
 It is advisable to specify the desired name for this column. This way, you avoid potential confusions/mistakes 
 when referring to it (e.g., in native queries). In this case, we add @JoinColumn to the Book entity as follows:
 @JoinColumn(name = "load_id")
+
+https://github.com/Apress/spring-boot-persistence-best-practices
