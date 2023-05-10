@@ -39,6 +39,8 @@ public class PrescriptionLoadDomainService {
 
   public List<PrescriptionLoad> getALlPrescriptionLoad() {
     var allLoads = loadRepository.findAll();
+    System.out.println(allLoads.get(0).getItems());
+    System.out.println(allLoads);
     //        var collect = allLoads.stream().map(PrescriptionLoadDto::new).toList();
     return allLoads;
   }

@@ -1,6 +1,7 @@
 package com.drones.dispatcherdrone.medicationmanager.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +49,7 @@ public class PrescriptionLoad {
   @Column(length = 15)
   private String status;
 
+  @JsonManagedReference
   @OneToMany(
       cascade = CascadeType.ALL,
       orphanRemoval = true,

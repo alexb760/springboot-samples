@@ -1,5 +1,6 @@
 package com.drones.dispatcherdrone.medicationmanager.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +44,7 @@ public class Medication {
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "load_id")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonBackReference
     private PrescriptionLoad prescriptionLoad;
 
     @Override
